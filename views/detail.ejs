@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品詳細 | 日本家具店</title>
+    <meta name="description" content="">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.0/css/bootstrap-reboot.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header>
+            <!-- カート内の商品一覧 -->
+        <h1>日本家具店</h1>
+    </header>
+    <main>
+        <div class="container">
+            <div class="cart"><a href="/cart"><i class="fa fa-shopping-cart" aria-hidden="true"></i></a></div>
+            <div class="detail-container">
+                <div class="detail-productImg">
+                    <p><img src=../<%= product[0].imageSrc %>></p>
+                </div>
+                <div class="detail-productDesc">
+                    <h2 class="detail-productName"><%= product[0].name %></h2>
+                    <h3 class="detail-productPrice">&yen;<%= product[0].price.toLocaleString() %><span>税込</span></h3>
+                    <p><a href=""><button class="cartBtn">カートに入れる</button></a></p>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <div class="footer-textarea">&copy; hoge.,LTD. all rights reserved</div>
+    </footer>
+</body>
+</html>

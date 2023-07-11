@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>日本家具店</title>
+        <meta name="description" content="">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.0/css/bootstrap-reboot.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="./css/style.css">
+    </head>
+    <body>
+        <header>
+            <!-- カート内の商品一覧 -->
+            <div class="cart"><a href="/cart"><i class="fa fa-shopping-cart" aria-hidden="true"></i></a></div>
+            <h1>日本家具店</h1>
+        </header>
+        <main>
+            <div class="container">
+                <div class="topImage"></div>
+                <div class="userActionArea">
+                    <div>
+                        並べ替え
+                        <select id="sortSelect">
+                            <option value="" disabled selected>選択してください</option>
+                            <option value="base"       > 標準</option>
+                            <option value="price:desc"> 価格が高い順</option>
+                            <option value="price:asc" > 価格が安い順</option>
+                            <option value="name:asc" > 50音順</option>
+                            <option value="rating:desc" > レビューの評価順</option>
+                            <option value="evaluation:desc" > レビューが多い順</option>
+                        </select>
+                    </div>
+            </div>
+                <div id="productArea" class="productArea"></div>
+            </div>
+        </main>
+        <footer>
+            <div class="footer-textarea">&copy; hoge.,LTD. all rights reserved</div>
+        </footer>
+        <script>
+            const productArea = document.querySelector("#productArea")
+            // サーバー側から取得した無加工の商品データ
+            const productsOrg = JSON.parse('<%= JSON.stringify(products) %>'.replace(/&#34;/g, '"'));
+
+            // ユニークな値を取り出す
+            let productsArray = []
+            let uniqueNumberArray = new Set()
+            productsOrg.map((productOrg, index) => {
+                uniqueNumberArray.add(productOrg.itemId)
+            })
+            // 商品番号が入ったセットオブジェクト分処理を繰り返す
+            for (let uniqueNumber of uniqueNumberArray) {
+                // 商品番号が一致する要素が見つかったら保持
+                const productOrg = productsOrg.find((product) => product.itemId === Number(uniqueNumber));
+                if (productOrg) {
+                    const tmpObj = {
+                        itemId: productOrg.itemId,
+                        name: productOrg.name,
+                        imageSrc: productOrg.imageSrc,
+                        price: productOrg.price,
+                    };
+                    // 配列へ商品情報をプッシュ
+                    productsArray.push(tmpObj);
+                }
+            }
+
+            // 評価平均を割り出す
+            productsArray.forEach((product, index) => {
+                let ratingSum = 0
+                let ratingCount = 0
+                productsOrg.map((productOrg, index) => {
+                    if(product.itemId === productOrg.itemId) {
+                        ratingSum += productOrg.evaluation
+                        ratingCount++
+                    }
+                })
+                productsArray[index].ratingAverage = Math.floor(ratingSum * 10 / ratingCount) / 10
+                productsArray[index].ratingCount = ratingCount
+            })
+
+            // ページ読み込み時に商品一覧を生成
+            window.onload = () => {
+                createProductList(productsArray)
+            }
+
+            // 並べ替えを選択された場合のソート処理
+            sortSelect.addEventListener("change", ()=> {
+                // 配列をコピー
+                let filteredArray = JSON.parse(JSON.stringify(productsArray));
+                // ソートに選択された値を検索
+                for(option of sortSelect.options) {
+                    if(option.selected) {
+                        if(option.value === "price:desc") {
+                            filteredArray.sort((a, b) => {return b.price - a.price;})
+                        } else if(option.value === "price:asc") {
+                            filteredArray.sort((a, b) => {return a.price - b.price})
+                        } else if(option.value === "name:asc") {
+                            filteredArray.sort((a, b) => {return a.name.localeCompare(b.name);})
+                        } else if(option.value === "rating:desc") {
+                            filteredArray.sort((a, b) => {return b.ratingAverage - a.ratingAverage})
+                        } else if(option.value === "evaluation:desc") {
+                            filteredArray.sort((a, b) => {return b.ratingCount - a.ratingCount})
+                        }
+                    }
+                }
+                // ソートしたユーザー情報で商品リストを生成
+                createProductList(filteredArray)
+            })
+
+
+            /*
+                渡された商品のリストを生成するメソッド
+            */
+            function createProductList(productsObj) {
+                // リストは都度初期化
+                while(productArea.firstChild) {
+                    productArea.firstChild.remove()
+                }
+                productsObj.forEach((product) => {
+                    const content     = document.createElement("div")
+                    const productLink = document.createElement("a")
+                    const imgParag    = document.createElement("p")
+                    const productImg  = document.createElement("img")
+                    const productName = document.createElement("p")
+                    const price       = document.createElement("p")
+                    const ratingParag = document.createElement("p")
+                    const ratingSpan  = document.createElement("span")
+                    const ratingCount = document.createElement("span")
+
+                    content.classList.add("product")
+                    productLink.setAttribute("href", `/detail/${product.itemId}`)
+                    productImg.setAttribute("src", `./${product.imageSrc}`)
+                    productName.innerHTML = product.name;
+                    price.innerHTML = `&yen;${product.price.toLocaleString()}`;
+
+                    // ユーザー評価平均に合わせて星を設定
+                    if(product.ratingAverage > 5) {
+                        ratingParag.innerHTML = `&#9733;&#9733;&#9733;&#9733;&#9733`
+                    } else if(product.ratingAverage > 4) {
+                        ratingParag.innerHTML = `&#9733;&#9733;&#9733;&#9733;&#9734`
+                    } else if(product.ratingAverage > 3) {
+                        ratingParag.innerHTML = `&#9733;&#9733;&#9733;&#9734;&#9734`
+                    } else if(product.ratingAverage > 2) {
+                        ratingParag.innerHTML = `&#9733;&#9733;&#9734;&#9734;&#9734`
+                    } else if(product.ratingAverage > 1) {
+                        ratingParag.innerHTML = `&#9733;&#9734;&#9734;&#9734;&#9734`
+                    }
+                    ratingParag.classList.add("rating")
+                    ratingSpan.innerHTML = product.ratingAverage
+                    ratingCount.classList.add("ratingCount")
+                    ratingCount.innerHTML = `${product.ratingCount}件のレビュー`
+
+                    ratingParag.append(ratingSpan)
+                    ratingParag.append(ratingCount)
+                    imgParag.append(productImg)
+                    productLink.append(imgParag)
+                    productLink.append(productName)
+                    productLink.append(price)
+                    productLink.append(ratingParag)
+                    content.append(productLink)
+                    productArea.append(content)
+                });
+            }
+
+
+        </script>
+    </body>
+</html>

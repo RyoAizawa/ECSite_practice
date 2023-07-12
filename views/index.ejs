@@ -32,7 +32,7 @@
                             <option value="evaluation:desc" > レビューが多い順</option>
                         </select>
                     </div>
-            </div>
+                </div>
                 <div id="productArea" class="productArea"></div>
             </div>
         </main>
@@ -109,7 +109,6 @@
                 createProductList(filteredArray)
             })
 
-
             /*
                 渡された商品のリストを生成するメソッド
             */
@@ -133,18 +132,17 @@
                     productLink.setAttribute("href", `/detail/${product.itemId}`)
                     productImg.setAttribute("src", `./${product.imageSrc}`)
                     productName.innerHTML = product.name;
-                    price.innerHTML = `&yen;${product.price.toLocaleString()}`;
-
+                    price.innerHTML = `&yen;${(product.price * 1.08).toLocaleString()}`;
                     // ユーザー評価平均に合わせて星を設定
-                    if(product.ratingAverage > 5) {
+                    if(product.ratingAverage >= 5) {
                         ratingParag.innerHTML = `&#9733;&#9733;&#9733;&#9733;&#9733`
-                    } else if(product.ratingAverage > 4) {
+                    } else if(product.ratingAverage >= 4) {
                         ratingParag.innerHTML = `&#9733;&#9733;&#9733;&#9733;&#9734`
-                    } else if(product.ratingAverage > 3) {
+                    } else if(product.ratingAverage >= 3) {
                         ratingParag.innerHTML = `&#9733;&#9733;&#9733;&#9734;&#9734`
-                    } else if(product.ratingAverage > 2) {
+                    } else if(product.ratingAverage >= 2) {
                         ratingParag.innerHTML = `&#9733;&#9733;&#9734;&#9734;&#9734`
-                    } else if(product.ratingAverage > 1) {
+                    } else if(product.ratingAverage >= 1) {
                         ratingParag.innerHTML = `&#9733;&#9734;&#9734;&#9734;&#9734`
                     }
                     ratingParag.classList.add("rating")

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>お買い物カゴ | 日本家具店</title>
+        <meta name="description" content="">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.0/css/bootstrap-reboot.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="../css/style.css">
+    </head>
+    <body>
+        <header>
+            <!-- カート内の商品一覧 -->
+            <h1>日本家具店</h1>
+        </header>
+        <main>
+            <div id="alert"></div>
+            <div class="container">
+                <div class="breadcrumbs">
+                    <p><span><a href="/">商品一覧ページ</a></span> > <span>お買い物カゴ</span></p>
+                </div>
+                <h2>お買い物カゴ</h2>
+                <div class="shoppingCart-area">
+                    <table class="shoppingCart-table">
+                        <thead>
+                            <tr>
+                                <th colspan="3">商品</th>
+                                <th>値段</th>
+                                <th>個数</th>
+                                <th>合計</th>
+                            </tr>
+                        </thead>
+                        <tbody  id="shoppingCartTable">
+                            <!-- カート内の情報を出力する領域 -->
+                        </tbody>
+                    </table>
+                    <div class="shoppingCart-summary-area">
+                        <p>小計（<%= cartInfo.length %>個の商品）（税込）</p>
+                        <p class="shoppingCart-summary-totalPrice" id="shoppingCartSummaryTotalPrice"></p>
+                        <p><a href="#"><button class="buleBtn shoppingCart-summary-billBtn">お会計に進む</button></a></p>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <div class="homeBtn-area">
+            <p><a href="/"><button class="buleBtn homeBtn">商品一覧へ戻る</button></a></p>
+        </div>
+        <footer>
+            <div class="footer-textarea">&copy; hoge.,LTD. all rights reserved</div>
+        </footer>
+
+        <script>
+            const cartInfoOrg = JSON.parse('<%= JSON.stringify(cartInfo) %>'.replace(/&#34;/g, '"'));
+            console.log(cartInfoOrg)
+            const shoppingCartArea  = document.querySelector(".shoppingCart-area")
+            const shoppingCartTable = document.querySelector("#shoppingCartTable")
+            const alert = document.querySelector("#alert")
+            const taxRate = 1.08
+            let totalPrice = 0
+
+            window.onload = () => {
+                createShoppingCartList(cartInfoOrg)
+            }
+
+            function createShoppingCartList(cartInfoObj) {
+
+                if(cartInfoObj.length <= 0) {
+                    shoppingCartArea.innerHTML = "まだお買い物カゴに商品が入っていません。"
+                    return
+                }
+
+                // リストは都度初期化
+                while (shoppingCartTable.firstChild) {
+                    shoppingCartTable.firstChild.remove()
+                }
+                // カートに入っている情報分処理を繰り返す
+                cartInfoObj.forEach((item, index) => {
+                    // テーブル行
+                    const tableRow     = document.createElement("tr")
+                    // 削除ボタン
+                    const deleteTd     = document.createElement("td")
+                    const deleteAnchor = document.createElement("a")
+                    // 商品画像
+                    const imgTd        = document.createElement("td")
+                    const itemImg      = document.createElement("img")
+                    // 商品名
+                    const itemNameTd   = document.createElement("td")
+                    // 値段
+                    const priceTd      = document.createElement("td")
+                    // 個数
+                    const valueTd      = document.createElement("td")
+                    const value        = document.createElement("span")
+                    const plusBtn      = document.createElement("button")
+                    const minusBtn     = document.createElement("button")
+                    // お値段×個数の合計
+                    const sumTd        = document.createElement("td")
+
+                    // 属性等の設定
+                    deleteAnchor.setAttribute("href", `/delete/${item.id}`)
+                    deleteAnchor.classList.add("shoppingCart-table-delete")
+                    itemImg.setAttribute("src", `./${item.imageSrc}`)
+                    minusBtn.classList.add("shoppingCart-table-minusBtn")
+                    plusBtn.classList.add("shoppingCart-table-plusBtn")
+                    value.classList.add("shoppingCart-table-value")
+                    sumTd.classList.add("shoppingCart-table-sum")
+                    // 値の設定
+                    deleteAnchor.innerHTML = "×"
+                    itemNameTd.innerHTML   = `${item.name}`
+                    priceTd.innerHTML      = `&yen;${(item.price * taxRate).toLocaleString()}`
+                    sumTd.innerHTML        = `&yen;${((item.price * item.value) * taxRate).toLocaleString()}`
+                    minusBtn.innerHTML     = "-"
+                    value.innerHTML        = `${item.value}個`
+                    plusBtn.innerHTML      = "+"
+                    // 追加
+                    deleteTd.append(deleteAnchor)
+                    imgTd.append(itemImg)
+                    valueTd.append(minusBtn)
+                    valueTd.append(value)
+                    valueTd.append(plusBtn)
+                    tableRow.append(deleteTd)
+                    tableRow.append(imgTd)
+                    tableRow.append(itemNameTd)
+                    tableRow.append(priceTd)
+                    tableRow.append(valueTd)
+                    tableRow.append(sumTd)
+                    // ブラウザ出力
+                    shoppingCartTable.append(tableRow)
+
+                    // 個数選択ボタンをクリック
+                    plusBtn.addEventListener("click", {method: "plus", handleEvent: plusMinus} )
+                    minusBtn.addEventListener("click", {method: "minus", handleEvent: plusMinus} )
+                    // 個数の選択ボタンを押した際の個数の増減処理
+                    function plusMinus() {
+                        if(this.method === "plus" && cartInfoObj[index].value < 10) {
+                            cartInfoObj[index].value++
+                        } else if (this.method === "minus" && cartInfoObj[index].value > 1) {
+                            cartInfoObj[index].value--
+                        } else {
+                            // 10個以上、1個未満の場合は選択不可にしてアラートを出す
+                            alert.innerHTML = "これ以上選択出来ません。"
+                            alert.classList.add("alert")
+                            return
+                        }
+                        alert.innerHTML = ""
+                        alert.classList.remove("alert")
+                        // テーブル再作成
+                        createShoppingCartList(cartInfoObj)
+                        calcTotalPrice()
+                    }
+
+                    // 値段の合計値に各製品の値段を加算
+                    totalPrice += (item.price * item.value)
+                    calcTotalPrice()
+                });
+            }
+            function calcTotalPrice() {
+                document.querySelector("#shoppingCartSummaryTotalPrice").innerHTML = `&yen;${(totalPrice * taxRate).toLocaleString()}`
+            }
+        </script>
+    </body>
+</html>

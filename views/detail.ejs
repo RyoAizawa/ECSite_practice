@@ -1,37 +1,142 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>商品詳細 | 日本家具店</title>
-    <meta name="description" content="">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.0/css/bootstrap-reboot.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="../css/style.css">
-</head>
-<body>
-    <header>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>商品詳細 | 日本家具店</title>
+        <meta name="description" content="">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.0/css/bootstrap-reboot.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="../css/style.css">
+    </head>
+    <body>
+        <header>
             <!-- カート内の商品一覧 -->
-        <h1>日本家具店</h1>
-    </header>
-    <main>
-        <div class="container">
-            <div class="cart"><a href="/cart"><i class="fa fa-shopping-cart" aria-hidden="true"></i></a></div>
-            <div class="detail-container">
-                <div class="detail-productImg">
-                    <p><img src=../<%= product[0].imageSrc %>></p>
+            <h1>日本家具店</h1>
+        </header>
+        <main>
+            <div class="container">
+                <div class="breadcrumbs">
+                    <p><span><a href="/">商品一覧ページ</a></span> > <span><%= productData[0].name %></span></p>
                 </div>
-                <div class="detail-productDesc">
-                    <h2 class="detail-productName"><%= product[0].name %></h2>
-                    <h3 class="detail-productPrice">&yen;<%= product[0].price.toLocaleString() %><span>税込</span></h3>
-                    <p><a href=""><button class="cartBtn">カートに入れる</button></a></p>
+                <div class="cart"><a href="/cart"><i class="fa fa-shopping-cart" aria-hidden="true"></i></a></div>
+                <div class="detail-container">
+                    <div class="detail-productImg">
+                        <p><img src=../<%= productData[0].imageSrc %>></p>
+                    </div>
+                    <div class="detail-productDesc">
+                        <h2 class="detail-productName"><%= productData[0].name %></h2>
+                        <h3 class="detail-productPrice">&yen;<%= (productData[0].price * 1.08).toLocaleString() %><span>税込</span></h3>
+                        <form action="/cart" method="post" novalidate>
+                            <input type="hidden" name="itemId" value="<%= productData[0].itemId %>">
+                            <input type="hidden" name="imageSrc" value="<%= productData[0].imageSrc %>">
+                            <input type="hidden" name="name" value="<%= productData[0].name %>">
+                            <input type="hidden" name="value" value="1">
+                            <input type="hidden" name="price" value="<%= productData[0].price %>">
+                            <p><button type="submit" class="buleBtn detail-cartBtn">カートに入れる</button></p>
+                        </form>
+                    </div>
                 </div>
+                <div class="reviewArea">
+                    <div class="userActionArea">
+                        <div>
+                            並べ替え
+                            <select id="sortSelect">
+                                <option value="" disabled selected>選択してください</option>
+                                <option value="base">標準</option>
+                                <option value="rating:desc">評価の高い順</option>
+                                <option value="rating:asc"> 評価の低い順</option>
+                            </select>
+                        </div>
+                    </div>
+                    <p class="review-headline">商品レビュー</p>
+                </div>
+                <div id="reviewArea"></div>
             </div>
+        </main>
+        <div class="homeBtn-area">
+            <p><a href="/"><button class="buleBtn homeBtn">商品一覧へ戻る</button></a></p>
         </div>
-    </main>
-    <footer>
-        <div class="footer-textarea">&copy; hoge.,LTD. all rights reserved</div>
-    </footer>
-</body>
+        <footer>
+            <div class="footer-textarea">&copy; hoge.,LTD. all rights reserved</div>
+        </footer>
+
+        <script>
+            const reviewArea = document.querySelector("#reviewArea")
+            const productData = JSON.parse('<%= JSON.stringify(productData) %>'.replace(/&#34;/g, '"'));
+            console.log(productData[0])
+            window.onload = () => {
+                createReviewList(productData)
+            }
+
+            /*
+            ブラウザに出力するデータを作成するメソッド
+                productObj...ブラウザ出力するレビューのデータ群
+            */
+            function createReviewList(productObj) {
+                // リストは都度初期化
+                while (reviewArea.firstChild) {
+                    reviewArea.firstChild.remove()
+                }
+                productObj.map((product) => {
+                    const username = document.createElement("p")
+                    username.innerHTML = `${product.userId}さん`
+                    const reviewContent = document.createElement("div")
+                    const ratingArea    = document.createElement("div")
+                    const ratingParag   = document.createElement("p")
+                    const ratingSpan    = document.createElement("span")
+                    const content       = document.createElement("p")
+                    const editLink = document.createElement("a")
+                    // 各要素へ属性の付与
+                    reviewContent.classList.add("review-content")
+                    ratingArea.classList.add("rating", "detail-rating")
+                    // ユーザー評価平均に合わせて星を設定
+                    if(product.evaluation === 1) {
+                        ratingParag.innerHTML = `&#9733;&#9734;&#9734;&#9734;&#9734`
+                    } else if(product.evaluation === 2) {
+                        ratingParag.innerHTML = `&#9733;&#9733;&#9734;&#9734;&#9734`
+                    } else if(product.evaluation === 3) {
+                        ratingParag.innerHTML = `&#9733;&#9733;&#9733;&#9734;&#9734`
+                    } else if(product.evaluation === 4) {
+                        ratingParag.innerHTML = `&#9733;&#9733;&#9733;&#9733;&#9734`
+                    } else if(product.evaluation === 5) {
+                        ratingParag.innerHTML = `&#9733;&#9733;&#9733;&#9733;&#9733`
+                    }
+                    ratingSpan.innerHTML = product.evaluation
+                    content.innerHTML = product.content
+                    editLink.innerHTML = "レビューを編集する"
+                    editLink.classList.add("edit-Link")
+                    editLink.setAttribute("href", `/edit/${product.id}`)
+                    // レビュー表示領域の完成
+                    ratingParag.append(ratingSpan)
+                    ratingArea.append(ratingParag)
+                    reviewContent.append(username)
+                    reviewContent.append(ratingArea)
+                    reviewContent.append(content)
+                    reviewContent.append(editLink)
+                    // ブラウザへ出力
+                    reviewArea.append(reviewContent)
+                })
+            }
+
+            // 並べ替えを選択された場合のソート処理
+            sortSelect.addEventListener("change", ()=> {
+                // 配列をコピー
+                let filteredArray = JSON.parse(JSON.stringify(productData));
+                // ソートに選択された値を検索
+                for(option of sortSelect.options) {
+                    if(option.selected) {
+                        if(option.value === "rating:desc") {
+                            filteredArray.sort((a, b) => {return b.evaluation - a.evaluation})
+                        } else if(option.value === "rating:asc") {
+                            filteredArray.sort((a, b) => {return a.evaluation - b.evaluation})
+                        }
+                    }
+                }
+                // ソートした情報でレビュー一覧を作成
+                createReviewList(filteredArray)
+            })
+        </script>
+    </body>
 </html>

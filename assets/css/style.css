@@ -13,6 +13,10 @@ body {
     font-feature-settings: "palt";
     background-color: #e8fcff7d;
 }
+input, select, textarea{
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN",
+        "Hiragino Sans", Meiryo, sans-serif;
+}
 a,
 a:hover {
     color: #333;
@@ -38,7 +42,7 @@ h2,h3 {
     color: #40a6f9;
     font-size: 1.2rem;
 }
-.buleBtn {
+.blueBtn {
     padding: 20px;
     border: none;
     background-color: #1f82f3;
@@ -47,7 +51,7 @@ h2,h3 {
     border-radius: 5px;
     font-size: 2.0rem;
 }
-.buleBtn:active {
+.blueBtn:active {
     transform: translateY(3px);
     box-shadow: none;
     outline: none;
@@ -61,6 +65,17 @@ h2,h3 {
 .homeBtn {
     width: 30%;
 }
+.page-headline {
+    margin-left: 20px;
+}
+
+@media screen and (max-width: 768px) {
+    .homeBtn {
+    width: 70%;
+
+    }
+}
+
 /*-------------------------
 グローバル
 -------------------------*/
@@ -78,6 +93,10 @@ header h1 {
     font-weight: normal;
     text-shadow: 3px 3px #ddd;
 }
+header h1>a {
+    display: inline-block;
+    text-align: center;
+}
 .cart {
     position: fixed;
     top: 30px;
@@ -92,14 +111,11 @@ header h1 {
 .fa-shopping-cart {
     color: #fff;
     padding: 15px 30px;
-
 }
 footer {
     position: relative;
     height: 150px;
-    /* background-color: #cccccc; */
     background: url("../image/background.jpg") 0 0 / cover no-repeat;
-    /* border-top: 1px solid #aaa; */
 }
 footer .footer-textarea {
     position: absolute;
@@ -107,6 +123,18 @@ footer .footer-textarea {
     left: 50%;
     transform: translate(-50%, -50%);
 }
+
+@media screen and (max-width: 768px) {
+    header h1 {
+        font-size: 4.0rem;
+        letter-spacing: 0;
+    }
+    .cart {
+        top: 15px;
+        right: 15px;
+    }
+}
+
 /*-------------------------
     商品一覧
 -------------------------*/
@@ -115,7 +143,6 @@ footer .footer-textarea {
     height: 500px;
     width: 100%;
     background: url("../image/top.jpg") 0 center / cover no-repeat;
-    object-fit: cover;
     opacity: 0.9;
 }
 .productArea {
@@ -135,14 +162,33 @@ footer .footer-textarea {
     object-fit: cover;
 }
 
+@media screen and (max-width: 768px) {
+    .topImage {
+        height: 300px;
+        width: 100%;
+        background: url("../image/top.jpg") 0 center / cover no-repeat;
+    }
+    .productArea {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+
 /*-------------------------
     ユーザー操作領域
 -------------------------*/
 .userActionArea {
-    width: 100%;
+    display: grid;
     background-color: #f6f6f6;
     border:1px solid #ddd;
     padding: 20px 30px;
+    grid-template-columns: 70% 30%;
+}
+.userActionArea-post {
+    text-align: center;
+}
+.userActionArea-post>a {
+    color: #1f82f3;
 }
 select {
     padding: 5px;
@@ -194,28 +240,42 @@ select {
 .detail-cartBtn {
     width: 70%;
 }
+@media screen and (max-width: 768px) {
+    .detail-container {
+        display: block;
+        margin-bottom: 0;
+    }
+    .detail-productImg {
+        width: 100%;
+    }
+    .detail-productDesc {
+        width: 100%;
+    }
+    .detail-cartBtn {
+        display: block;
+        margin: 0 auto;
+    }
+}
+
 
 /*-------------------------
     レビュー出力領域
 -------------------------*/
-#reviewArea {
-    margin: 50px auto;
-}
-.review-headline {
+.detail-review-headline {
     text-align: center;
     font-size: 2.4rem;
     padding: 30px;
     border-bottom: 1px dotted #ccc;
 }
-.review-contentarea {
-    display: flex;
-    padding: 10px 0;
+#reviewArea {
+    margin-bottom: 50px;
 }
+
 .review-content {
     position: relative;
     width: 75%;
     margin: 0 auto;
-    padding: 20px;
+    padding: 30px 20px;
 }
 .review-content~.review-content {
     border-top: 1px solid #ddd;
@@ -228,7 +288,7 @@ select {
 }
 .edit-Link {
     position: absolute;
-    bottom: 10px;
+    bottom: 5px;
     right: 20px;
     font-size: 1.4rem;
     color: #1f82f3;
@@ -287,7 +347,7 @@ select {
     border-top: 1px solid #ccc;
 }
 .shoppingCart-table td>img {
-    width: 200px;
+    width: 100%;
     height: 200px;
 }
 .shoppingCart-table-delete {
@@ -296,21 +356,20 @@ select {
 }
 .shoppingCart-table-value {
     display: inline-block;
-    width: 60px;
+    max-width: 35px;
     padding: 5px;
 }
 .shoppingCart-table-plusBtn ,
 .shoppingCart-table-minusBtn {
     display: inline-block;
-    width: 40px;
-    height: 40px;
-    font-size: 2.3rem ;
+    width: 35px;
+    height: 35px;
+    font-size: 2.0rem ;
     color: #bbb;
     text-shadow: 1px 1px 1px #cccccccc;
     border: 2px solid #ccc;
     background-color: #f5f5f5;
     border-radius: 50%;
-    vertical-align: baseline;
     box-shadow: 0 2px 0 #ccc;
     outline: none;
 }
@@ -333,7 +392,7 @@ select {
     position: sticky;
     top: 10px;
     width: 20%;
-    height: 300px;
+    max-height: 300px;
     text-align: center;
     padding: 30px 20px;
     background-color: rgba(222, 237, 249, 0.383);
@@ -342,9 +401,91 @@ select {
 }
 .shoppingCart-summary-totalPrice {
     font-size: 2.0rem;
-    margin: 50px 0;
+    margin: 45px 0;
 }
 
 .shoppingCart-summary-billBtn {
     width: 100%;
+}
+
+@media screen and (max-width: 768px) {
+    .shoppingCart-area {
+        display: grid;
+        grid-template-columns: 100%;
+    }
+    .shoppingCart-table {
+        width: 100%;
+        table-layout: fixed;
+    }
+    .shoppingCart-table th,
+    .shoppingCart-table td {
+        padding: 20px 5px;
+    }
+    .shoppingCart-table td>img {
+        width: 100%;
+        height: 100px;
+    }
+    .shoppingCart-summary-area {
+        width: 100%;
+        height: auto;
+    }
+    .shoppingCart-summary-totalPrice {
+        margin: 20px 0;
+    }
+}
+
+
+/*-------------------------
+    レビュー編集、投稿
+-------------------------*/
+.review-form {
+    position: relative;
+    max-width: 600px;
+    padding: 0 20px;
+    margin: 20px auto 50px;
+}
+.review-form table {
+    width: 100%;
+}
+.review-form input[type="text"],
+.review-form textarea {
+    width: 100%;
+    padding: 5px;
+    line-height: 1.6;
+}
+.review-form textarea {
+    height: calc(1.6em * 5);
+}
+.review-form td {
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ccc;
+}
+.review-form button[type="submit"] {
+    margin-top: 20px;
+    padding: 10px;
+    border-color: #aaa;
+    border-radius: 5px;
+}
+.error {
+    font-size: 1.4rem;
+    color: red;
+    margin-left: 10px;
+}
+.review-submitBtn {
+    display: block;
+    margin: 0 auto;
+}
+.delete-link {
+    position: absolute;
+    display: block;
+    bottom: 0px;
+    right: 0px;
+    font-size: 1.4rem;
+    color: #1f82f3;
+}
+@media screen and (max-width: 768px) {
+    .review-form input[type="text"],
+    .review-form textarea {
+        width: 100%;
+    }
 }

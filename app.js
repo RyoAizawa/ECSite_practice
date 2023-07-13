@@ -40,15 +40,96 @@ app.get("/", (req, res) => {
 });
 
 /*
+    商品詳細、レビュー投稿。レビューテーブルと商品テーブルを結合
+    レビューテーブル: 商品ID
+    商品テーブル: 商品名
+*/
+app.get("/post/:itemId", (req, res) => {
+    const sql =
+        "SELECT review.itemId, products.name FROM review JOIN products ON products.id = review.itemId WHERE review.itemId = ?";
+    con.query(sql, req.params.itemId, function (err, result, fields) {
+        if (err) throw err;
+        res.render("postForm", { review: result[0] });
+    });
+});
+/*
+    レビュー編集画面、送信。
+    レビューテーブルにポストした値を渡し更新
+*/
+app.post("/post/:itemId", (req, res) => {
+    req.body.content = convert(req.body.content);
+    function convert(jsonString) {
+        return jsonString
+            .replace(/(\r\n)/g, "\n")
+            .replace(/(\r)/g, "\n")
+            .replace(/(\n)/g, "\\n");
+    }
+    const sql =
+        "INSERT INTO review SET ?";
+    con.query(sql, req.body , function (err, result, fields) {
+        if (err) throw err;
+        res.redirect(`/detail/${req.body.itemId}`);
+    });
+});
+
+/*
+    レビュー編集画面、削除。
+    レビューテーブルから指定したidのレビューを削除
+*/
+app.get("/deleteReview/:itemId/:id", (req, res) => {
+    const sql =
+        "DELETE FROM review WHERE id = " + req.params.id;
+    con.query(sql, function (err, result, fields) {
+        if (err) throw err;
+        res.redirect(`/detail/${req.params.itemId}`);
+    });
+});
+
+/*
     商品詳細。レビューテーブルと商品テーブルを結合
-    結合した全ての情報を返す
+    レビューテーブル:id, 商品ID, ユーザー名, レビュー内容, レーティング
+    商品テーブル: 商品画像, 商品名, お値段
 */
 app.get("/detail/:id", (req, res) => {
     const sql =
-        "SELECT * FROM review JOIN products ON products.id = review.itemId WHERE review.itemId = ?";
+        "SELECT review.id, review.itemId, review.userId, review.content, review.evaluation, products.imageSrc, products.name, products.price FROM review JOIN products ON products.id = review.itemId WHERE review.itemId = ?";
     con.query(sql, req.params.id, function (err, result, fields) {
         if (err) throw err;
+        console.log(result)
         res.render("detail", { productData: result });
+    });
+});
+
+/*
+    商品詳細、レビュー編集。レビューテーブルと商品テーブルを結合
+    レビューテーブル:id, 商品ID, ユーザー名, レビュー内容, レーティング
+    商品テーブル: 商品名
+*/
+app.get("/edit/:id", (req, res) => {
+    const sql =
+        "SELECT review.id, review.itemId, review.userId, review.content, review.evaluation, products.name FROM review JOIN products ON products.id = review.itemId WHERE review.id = ?";
+    con.query(sql, req.params.id, function (err, result, fields) {
+        if (err) throw err;
+        res.render("editForm", { review: result[0] });
+    });
+});
+/*
+    レビュー編集画面、送信。
+    レビューテーブルにポストした値を渡し更新
+*/
+app.post("/update/:id", (req, res) => {
+    req.body.content = convert(req.body.content);
+    function convert(jsonString) {
+        return jsonString
+            .replace(/(\r\n)/g, "\n")
+            .replace(/(\r)/g, "\n")
+            .replace(/(\n)/g, "\\n");
+    }
+    const sql =
+        "UPDATE review SET ? WHERE review.id = "+ req.params.id;
+    con.query(sql, req.body , function (err, result, fields) {
+        if (err) throw err;
+        res.redirect(`/detail/${req.body.itemId}`);
     });
 });
 
@@ -89,7 +170,6 @@ app.post("/cart", (req, res) => {
         }
     });
 });
-
 /*
     お買い物カゴ。
     カート内の情報を取得
@@ -102,12 +182,11 @@ app.get("/cart", (req, res) => {
         res.render("cart", {cartInfo: result} );
     });
 });
-
 /*
     お買い物カゴ。
     カート内から指定したカラムを削除
 */
-app.get("/delete/:id", (req, res) => {
+app.get("/deleteItem/:id", (req, res) => {
     const sql =
         "DELETE FROM shoppingcart WHERE id = " + req.params.id;
     con.query(sql, function (err, result, fields) {

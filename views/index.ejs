@@ -1,20 +1,14 @@
 <!DOCTYPE html>
 <html lang="ja">
     <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>日本家具店</title>
-        <meta name="description" content="">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.0/css/bootstrap-reboot.min.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-        <link rel="stylesheet" href="./css/style.css">
+        <%- include("./partials/head", {
+            title: "日本家具店",
+            cssPath: "./css/style.css"
+        })%>
     </head>
     <body>
         <header>
-            <!-- カート内の商品一覧 -->
-            <div class="cart"><a href="/cart"><i class="fa fa-shopping-cart" aria-hidden="true"></i></a></div>
-            <h1>日本家具店</h1>
+            <%- include("./partials/header", {cart: true} ) %>
         </header>
         <main>
             <div class="container">
@@ -24,12 +18,12 @@
                         並べ替え
                         <select id="sortSelect">
                             <option value="" disabled selected>選択してください</option>
-                            <option value="base"       > 標準</option>
+                            <option value="base"> 標準</option>
                             <option value="price:desc"> 価格が高い順</option>
-                            <option value="price:asc" > 価格が安い順</option>
-                            <option value="name:asc" > 50音順</option>
-                            <option value="rating:desc" > レビューの評価順</option>
-                            <option value="evaluation:desc" > レビューが多い順</option>
+                            <option value="price:asc"> 価格が安い順</option>
+                            <option value="name:asc"> 50音順</option>
+                            <option value="rating:desc"> レビューの評価順</option>
+                            <option value="evaluation:desc"> レビューが多い順</option>
                         </select>
                     </div>
                 </div>
@@ -37,7 +31,7 @@
             </div>
         </main>
         <footer>
-            <div class="footer-textarea">&copy; hoge.,LTD. all rights reserved</div>
+            <%- include("./partials/footer") %>
         </footer>
         <script>
             const productArea = document.querySelector("#productArea")
@@ -134,13 +128,13 @@
                     productName.innerHTML = product.name;
                     price.innerHTML = `&yen;${(product.price * 1.08).toLocaleString()}`;
                     // ユーザー評価平均に合わせて星を設定
-                    if(product.ratingAverage >= 5) {
+                    if(product.ratingAverage >= 4.5) {
                         ratingParag.innerHTML = `&#9733;&#9733;&#9733;&#9733;&#9733`
-                    } else if(product.ratingAverage >= 4) {
+                    } else if(product.ratingAverage >= 3.5) {
                         ratingParag.innerHTML = `&#9733;&#9733;&#9733;&#9733;&#9734`
-                    } else if(product.ratingAverage >= 3) {
+                    } else if(product.ratingAverage >= 2.5) {
                         ratingParag.innerHTML = `&#9733;&#9733;&#9733;&#9734;&#9734`
-                    } else if(product.ratingAverage >= 2) {
+                    } else if(product.ratingAverage >= 1.5) {
                         ratingParag.innerHTML = `&#9733;&#9733;&#9734;&#9734;&#9734`
                     } else if(product.ratingAverage >= 1) {
                         ratingParag.innerHTML = `&#9733;&#9734;&#9734;&#9734;&#9734`

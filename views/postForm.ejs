@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <%- include("./partials/head", {
+            title: "レビューを投稿する | 日本家具店",
+            cssPath: "../css/style.css"
+        })%>
+    </head>
+    <body>
+        <header>
+            <%- include("./partials/header", {cart: true} ) %>
+        </header>
+        <main>
+            <div class="container">
+                <div class="breadcrumbs">
+                    <p><span><a href="/">商品一覧ページ</a></span> > <span><a href="/detail/<%= review.itemId %>"><%= review.name %></a></span> > <span>レビュー投稿</span></p>
+                </div>
+                <h2 class="page-headline">レビューを投稿する</h2>
+                <form action="/post/<%= review.itemId %>" method="post" class="review-form" novalidate>
+                    <table>
+                        <tr>
+                            <td>
+                                <h3>お名前<span class="error" id="nameError"></span></h3>
+                                <input type="text" name="userId">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h3>評価<span class="error" id="evaluationError"></span></h3>
+                                <select name="evaluation" id="evaluation">
+                                    <option value="" disabled selected>選択してください</option>
+                                    <option value="1"> 評価１</option>
+                                    <option value="2"> 評価２</option>
+                                    <option value="3"> 評価３</option>
+                                    <option value="4"> 評価４</option>
+                                    <option value="5"> 評価５</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h3>レビュー内容<span class="error" id="contentError"></span></h3>
+                                <textarea name="content"></textarea>
+                            </td>
+                        </tr>
+                    </table>
+                    <input type="hidden" name="itemId" value="<%= review.itemId %>">
+                    <button type="submit" class="blueBtn review-submitBtn">送信</button>
+                </form>
+            </div>
+        </main>
+        <footer>
+            <%- include("./partials/footer") %>
+        </footer>
+        <script type="module">
+            import FormValidation from '../script/FormValidation.js'
+            // 投稿ボタンが押された際のバリデーションチェック
+            document.querySelector("button[type='submit']").addEventListener("click", (event) => {
+                FormValidation()
+            })
+        </script>
+    </body>
+</html>

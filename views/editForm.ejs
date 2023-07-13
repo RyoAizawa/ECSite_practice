@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <%- include("./partials/head", {
+            title: "レビューを編集する | 日本家具店",
+            cssPath: "../css/style.css"
+        })%>
+    </head>
+    <body>
+        <header>
+            <%- include("./partials/header", {cart: true} ) %>
+        </header>
+        <main>
+            <div class="container">
+                <div class="breadcrumbs">
+                    <p><span><a href="/">商品一覧ページ</a></span> > <span><a href="/detail/<%= review.itemId %>"><%= review.name %></a></span> > <span>レビュー編集</span></p>
+                </div>
+                <h2 class="page-headline">レビュー内容を編集する</h2>
+                <form action="/update/<%= review.id %>" method="post" class="review-form" novalidate>
+                    <table>
+                        <tr>
+                            <td>
+                                <h3>お名前<span class="error" id="nameError"></span></h3>
+                                <input type="text" name="userId" value="<%= review.userId %>">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h3>評価<span class="error" id="evaluationError"></span></h3>
+                                <select name="evaluation" id="evaluation" selected="<%= review.evaluation %>">
+                                    <option value="" disabled>選択してください</option>
+                                    <option value="1" <% if(review.evaluation ===1) { %> selected <% } %>> 評価１</option>
+                                    <option value="2" <% if(review.evaluation ===2) { %> selected <% } %>> 評価２</option>
+                                    <option value="3" <% if(review.evaluation ===3) { %> selected <% } %>> 評価３</option>
+                                    <option value="4" <% if(review.evaluation ===4) { %> selected <% } %>> 評価４</option>
+                                    <option value="5" <% if(review.evaluation ===5) { %> selected <% } %>> 評価５</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h3>レビュー内容<span class="error" id="contentError"></span></h3>
+                                <textarea name="content"><%= review.content %></textarea>
+                            </td>
+                        </tr>
+                    </table>
+                    <input type="hidden" name="itemId" value="<%= review.itemId %>">
+                    <button type="submit" class="blueBtn review-submitBtn">送信</button>
+                    <a href="javascript:void(0);" class="delete-link" id="deleteLink">このレビューを削除する</a>
+                </form>
+            </div>
+        </main>
+        <footer>
+            <%- include("./partials/footer") %>
+        </footer>
+        <script type="module">
+            import FormValidation from '../script/FormValidation.js'
+            // 投稿ボタンが押された際のバリデーションチェック
+            document.querySelector("button[type='submit']").addEventListener("click", (event) => {
+                FormValidation()
+            })
+
+            const content = document.querySelector("textarea[name='content']")
+            // テキストエリアは改行コードを\nから\r\nに変換
+            content.value = (content.value).replace(/\\n/g, '\r\n')
+
+            // レビュー削除選択時は、確認アラートを出して削除確認する
+            const review = JSON.parse('<%= JSON.stringify(review) %>'.replace(/&#34;/g, '"'));
+            document.querySelector("#deleteLink").addEventListener("click", () => {
+                if(confirm("本レビューを削除してよろしいですか？")) {
+                    location.assign(`/deleteReview/${review.itemId}/${review.id}`)
+                }
+            })
+
+        </script>
+    </body>
+</html>

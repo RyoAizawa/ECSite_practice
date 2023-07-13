@@ -1,19 +1,14 @@
 <!DOCTYPE html>
 <html lang="ja">
     <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>お買い物カゴ | 日本家具店</title>
-        <meta name="description" content="">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.0/css/bootstrap-reboot.min.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-        <link rel="stylesheet" href="../css/style.css">
+        <%- include("./partials/head", {
+            title: "お買い物カゴ | 日本家具店",
+            cssPath: "../css/style.css"
+        })%>
     </head>
     <body>
         <header>
-            <!-- カート内の商品一覧 -->
-            <h1>日本家具店</h1>
+            <%- include("./partials/header", {cart: false} ) %>
         </header>
         <main>
             <div id="alert"></div>
@@ -21,7 +16,7 @@
                 <div class="breadcrumbs">
                     <p><span><a href="/">商品一覧ページ</a></span> > <span>お買い物カゴ</span></p>
                 </div>
-                <h2>お買い物カゴ</h2>
+                <h2 class="page-headline">お買い物カゴ</h2>
                 <div class="shoppingCart-area">
                     <table class="shoppingCart-table">
                         <thead>
@@ -39,21 +34,20 @@
                     <div class="shoppingCart-summary-area">
                         <p>小計（<%= cartInfo.length %>個の商品）（税込）</p>
                         <p class="shoppingCart-summary-totalPrice" id="shoppingCartSummaryTotalPrice"></p>
-                        <p><a href="#"><button class="buleBtn shoppingCart-summary-billBtn">お会計に進む</button></a></p>
+                        <p><a href="#"><button class="blueBtn shoppingCart-summary-billBtn">お会計に進む</button></a></p>
                     </div>
                 </div>
             </div>
         </main>
         <div class="homeBtn-area">
-            <p><a href="/"><button class="buleBtn homeBtn">商品一覧へ戻る</button></a></p>
+            <p><a href="/"><button class="blueBtn homeBtn">商品一覧へ戻る</button></a></p>
         </div>
         <footer>
-            <div class="footer-textarea">&copy; hoge.,LTD. all rights reserved</div>
+            <%- include("./partials/footer") %>
         </footer>
 
         <script>
             const cartInfoOrg = JSON.parse('<%= JSON.stringify(cartInfo) %>'.replace(/&#34;/g, '"'));
-            console.log(cartInfoOrg)
             const shoppingCartArea  = document.querySelector(".shoppingCart-area")
             const shoppingCartTable = document.querySelector("#shoppingCartTable")
             const alert = document.querySelector("#alert")
@@ -71,6 +65,8 @@
                     return
                 }
 
+                // 小計は都度初期化
+                totalPrice = 0
                 // リストは都度初期化
                 while (shoppingCartTable.firstChild) {
                     shoppingCartTable.firstChild.remove()
@@ -98,7 +94,7 @@
                     const sumTd        = document.createElement("td")
 
                     // 属性等の設定
-                    deleteAnchor.setAttribute("href", `/delete/${item.id}`)
+                    deleteAnchor.setAttribute("href", `/deleteItem/${item.id}`)
                     deleteAnchor.classList.add("shoppingCart-table-delete")
                     itemImg.setAttribute("src", `./${item.imageSrc}`)
                     minusBtn.classList.add("shoppingCart-table-minusBtn")

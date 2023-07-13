@@ -1,19 +1,14 @@
 <!DOCTYPE html>
 <html lang="ja">
     <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>商品詳細 | 日本家具店</title>
-        <meta name="description" content="">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.0/css/bootstrap-reboot.min.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-        <link rel="stylesheet" href="../css/style.css">
+        <%- include("./partials/head", {
+            title: "商品詳細 | 日本家具店",
+            cssPath: "../css/style.css"
+        })%>
     </head>
     <body>
         <header>
-            <!-- カート内の商品一覧 -->
-            <h1>日本家具店</h1>
+            <%- include("./partials/header", {cart: true} ) %>
         </header>
         <main>
             <div class="container">
@@ -34,13 +29,13 @@
                             <input type="hidden" name="name" value="<%= productData[0].name %>">
                             <input type="hidden" name="value" value="1">
                             <input type="hidden" name="price" value="<%= productData[0].price %>">
-                            <p><button type="submit" class="buleBtn detail-cartBtn">カートに入れる</button></p>
+                            <p><button type="submit" class="blueBtn detail-cartBtn">カートに入れる</button></p>
                         </form>
                     </div>
                 </div>
-                <div class="reviewArea">
+                <div class="detail-reviewArea">
                     <div class="userActionArea">
-                        <div>
+                        <div class="userActionArea-sort">
                             並べ替え
                             <select id="sortSelect">
                                 <option value="" disabled selected>選択してください</option>
@@ -49,23 +44,25 @@
                                 <option value="rating:asc"> 評価の低い順</option>
                             </select>
                         </div>
+                        <div class="userActionArea-post">
+                            <a href="/post/<%= productData[0].itemId %>">この商品のレビューを投稿する</a>
+                        </div>
                     </div>
-                    <p class="review-headline">商品レビュー</p>
+                    <p class="detail-review-headline">商品レビュー</p>
                 </div>
                 <div id="reviewArea"></div>
             </div>
         </main>
         <div class="homeBtn-area">
-            <p><a href="/"><button class="buleBtn homeBtn">商品一覧へ戻る</button></a></p>
+            <p><a href="/"><button class="blueBtn homeBtn">商品一覧へ戻る</button></a></p>
         </div>
         <footer>
-            <div class="footer-textarea">&copy; hoge.,LTD. all rights reserved</div>
+            <%- include("./partials/footer") %>
         </footer>
 
         <script>
             const reviewArea = document.querySelector("#reviewArea")
             const productData = JSON.parse('<%= JSON.stringify(productData) %>'.replace(/&#34;/g, '"'));
-            console.log(productData[0])
             window.onload = () => {
                 createReviewList(productData)
             }
@@ -79,7 +76,7 @@
                 while (reviewArea.firstChild) {
                     reviewArea.firstChild.remove()
                 }
-                productObj.map((product) => {
+                productObj.forEach((product) => {
                     const username = document.createElement("p")
                     username.innerHTML = `${product.userId}さん`
                     const reviewContent = document.createElement("div")
@@ -104,6 +101,10 @@
                         ratingParag.innerHTML = `&#9733;&#9733;&#9733;&#9733;&#9733`
                     }
                     ratingSpan.innerHTML = product.evaluation
+                    // 改行を含む文字列の場合、改行コードをbrタグに変換する
+                    if(product.content.match("\n") !== null ) {
+                        product.content = product.content.replace(/\n/g, "<br>")
+                    }
                     content.innerHTML = product.content
                     editLink.innerHTML = "レビューを編集する"
                     editLink.classList.add("edit-Link")

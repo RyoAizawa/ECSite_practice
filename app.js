@@ -95,7 +95,6 @@ app.get("/detail/:id", (req, res) => {
         "SELECT review.id, review.itemId, review.userId, review.content, review.evaluation, products.imageSrc, products.name, products.price FROM review JOIN products ON products.id = review.itemId WHERE review.itemId = ?";
     con.query(sql, req.params.id, function (err, result, fields) {
         if (err) throw err;
-        console.log(result)
         res.render("detail", { productData: result });
     });
 });

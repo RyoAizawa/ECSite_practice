@@ -72,7 +72,6 @@ h2,h3 {
 @media screen and (max-width: 768px) {
     .homeBtn {
     width: 70%;
-
     }
 }
 
@@ -148,19 +147,32 @@ footer .footer-textarea {
 .productArea {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    column-gap: 20px;
     margin: 50px 20px;
 }
 .product {
-    max-width: 250px;
+    width: 100%;
     margin: 0 auto;
     margin-bottom: 100px;
 }
+.product-price span {
+    font-size: 0.8em;
+    margin-left: 6px;
+}
+.product>div {
+    max-width: 270px;
+    padding: 0 10px;
+    margin: 0 auto;
+}
+.product a {
+    -webkit-user-drag: none;
+}
 .product img {
+    -webkit-user-drag: none;
     height: 250px;
     width: 100%;
     object-fit: cover;
 }
+
 
 @media screen and (max-width: 768px) {
     .topImage {

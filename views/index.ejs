@@ -27,7 +27,7 @@
                         </select>
                     </div>
                 </div>
-                <div id="productArea" class="productArea"></div>
+                <div id="productArea" class="productArea"></ｄ>
             </div>
         </main>
         <footer>
@@ -36,7 +36,7 @@
         <script>
             const productArea = document.querySelector("#productArea")
             // サーバー側から取得した無加工の商品データ
-            const productsOrg = JSON.parse('<%= JSON.stringify(products) %>'.replace(/&#34;/g, '"'));
+            const productsOrg = JSON.parse('<%= JSON.stringify(products) %>'.replace(/&#34;/g, '"'))
 
             // ユニークな値を取り出す
             let productsArray = []
@@ -47,16 +47,16 @@
             // 商品番号が入ったセットオブジェクト分処理を繰り返す
             for (let uniqueNumber of uniqueNumberArray) {
                 // 商品番号が一致する要素が見つかったら保持
-                const productOrg = productsOrg.find((product) => product.itemId === Number(uniqueNumber));
+                const productOrg = productsOrg.find((product) => product.itemId === Number(uniqueNumber))
                 if (productOrg) {
                     const tmpObj = {
                         itemId: productOrg.itemId,
                         name: productOrg.name,
                         imageSrc: productOrg.imageSrc,
                         price: productOrg.price,
-                    };
+                    }
                     // 配列へ商品情報をプッシュ
-                    productsArray.push(tmpObj);
+                    productsArray.push(tmpObj)
                 }
             }
 
@@ -77,21 +77,23 @@
             // ページ読み込み時に商品一覧を生成
             window.onload = () => {
                 createProductList(productsArray)
+                // ドラッグ&ドロップで順番を入れ替えられる機能追加
+                sortByDragAndDrop()
             }
 
             // 並べ替えを選択された場合のソート処理
             sortSelect.addEventListener("change", ()=> {
                 // 配列をコピー
-                let filteredArray = JSON.parse(JSON.stringify(productsArray));
+                let filteredArray = JSON.parse(JSON.stringify(productsArray))
                 // ソートに選択された値を検索
                 for(option of sortSelect.options) {
                     if(option.selected) {
                         if(option.value === "price:desc") {
-                            filteredArray.sort((a, b) => {return b.price - a.price;})
+                            filteredArray.sort((a, b) => {return b.price - a.price})
                         } else if(option.value === "price:asc") {
                             filteredArray.sort((a, b) => {return a.price - b.price})
                         } else if(option.value === "name:asc") {
-                            filteredArray.sort((a, b) => {return a.name.localeCompare(b.name);})
+                            filteredArray.sort((a, b) => {return a.name.localeCompare(b.name)})
                         } else if(option.value === "rating:desc") {
                             filteredArray.sort((a, b) => {return b.ratingAverage - a.ratingAverage})
                         } else if(option.value === "evaluation:desc") {
@@ -101,6 +103,8 @@
                 }
                 // ソートしたユーザー情報で商品リストを生成
                 createProductList(filteredArray)
+                // ドラッグ&ドロップで順番を入れ替えられる機能追加
+                sortByDragAndDrop()
             })
 
             /*
@@ -111,13 +115,15 @@
                 while(productArea.firstChild) {
                     productArea.firstChild.remove()
                 }
-                productsObj.forEach((product) => {
+                productsObj.forEach((product, index) => {
                     const content     = document.createElement("div")
+                    const contentDiv  = document.createElement("div")
                     const productLink = document.createElement("a")
                     const imgParag    = document.createElement("p")
                     const productImg  = document.createElement("img")
                     const productName = document.createElement("p")
                     const price       = document.createElement("p")
+                    const priceInTax  = document.createElement("span")
                     const ratingParag = document.createElement("p")
                     const ratingSpan  = document.createElement("span")
                     const ratingCount = document.createElement("span")
@@ -125,8 +131,10 @@
                     content.classList.add("product")
                     productLink.setAttribute("href", `/detail/${product.itemId}`)
                     productImg.setAttribute("src", `./${product.imageSrc}`)
-                    productName.innerHTML = product.name;
-                    price.innerHTML = `&yen;${(product.price * 1.08).toLocaleString()}`;
+                    productName.innerHTML = product.name
+                    price.classList.add("product-price")
+                    price.innerHTML = `&yen;${(product.price * 1.08).toLocaleString()}`
+                    priceInTax.innerHTML = "税込"
                     // ユーザー評価平均に合わせて星を設定
                     if(product.ratingAverage >= 4.5) {
                         ratingParag.innerHTML = `&#9733;&#9733;&#9733;&#9733;&#9733`
@@ -146,17 +154,77 @@
 
                     ratingParag.append(ratingSpan)
                     ratingParag.append(ratingCount)
+                    price.append(priceInTax)
                     imgParag.append(productImg)
                     productLink.append(imgParag)
                     productLink.append(productName)
                     productLink.append(price)
                     productLink.append(ratingParag)
-                    content.append(productLink)
+                    contentDiv.append(productLink)
+                    content.append(contentDiv)
+                    content.setAttribute("draggable", "true")
+                    content.id = `item${index}`
                     productArea.append(content)
-                });
+                })
             }
 
-
+            /*
+                ドラッグ&ドロップで商品一覧の順番を入れ替えができるように
+                機能を追加するメソッド
+            */
+            function sortByDragAndDrop() {
+                    document.querySelectorAll('.product').forEach (item => {
+                        // ドラッグ開始
+                        item.ondragstart = () => {
+                            // ドラッグオブジェクトに、掴んでいる要素のidの情報をテキストで持たせる
+                            event.dataTransfer.setData('text/plain', event.target.id)
+                        }
+                        // ドラッグ状態のポインタがドロップ可能な要素上に重なった時
+                        item.ondragover = () => {
+                            event.preventDefault()
+                            // 現在乗っている要素の4辺の座標を取得
+                            let rect = item.getBoundingClientRect()
+                            // event.clientX ... ブラウザ左端からマウスポインタまでの水平距離
+                            // rect.left ... 掴んでいる要素の左端
+                            // item.clientWidth ... 現在乗っている要素の中心
+                            if ((event.clientX - rect.left) < (item.clientWidth / 2)) {
+                                //マウスカーソルの位置が要素の半分より左
+                                item.style.borderLeft = '2px solid blue'
+                                item.style.borderRight = ''
+                            } else {
+                                //マウスカーソルの位置が要素の半分より右
+                                item.style.borderLeft = ''
+                                item.style.borderRight = '2px solid blue'
+                            }
+                        }
+                        // ドラッグ状態のポインタが要素上から離れた時
+                        item.ondragleave = () => {
+                            item.style.borderLeft = ''
+                            item.style.borderRight = ''
+                        }
+                        // ドラッグ状態のポインタが要素上で落とされた時
+                        item.ondrop = () => {
+                            event.preventDefault()
+                            // 現在掴んでいる要素のID情報を取得する
+                            let id = event.dataTransfer.getData('text/plain')
+                            // 現在掴んでいる要素のノードを取得
+                            let item_drag = document.getElementById(id)
+                            // 現在乗っている要素の4辺の座標を取得
+                            let rect = item.getBoundingClientRect()
+                            if ((event.clientX - rect.left) < (item.clientWidth / 2)) {
+                                //マウスカーソルの位置が要素の半分より左
+                                // item(乗っている要素)の前にitem_drug(掴んでいる要素)を挿入
+                                item.parentNode.insertBefore(item_drag, item)
+                            } else {
+                                //マウスカーソルの位置が要素の半分より右
+                                // item.nextSibling(乗っている要素の次の要素)の前にitem_drug(掴んでいる要素)を挿入
+                                item.parentNode.insertBefore(item_drag, item.nextSibling)
+                            }
+                            item.style.borderLeft = ''
+                            item.style.borderRight = ''
+                        }
+                    })
+                }
         </script>
     </body>
 </html>
